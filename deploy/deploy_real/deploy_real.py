@@ -64,7 +64,7 @@ class Controller:
             raise ValueError("Invalid msg_type")
 
         # wait for the subscriber to receive data
-        self.wait_for_low_state()
+        #self.wait_for_low_state()
 
         # Initialize the command msg
         if config.msg_type == "hg":
@@ -93,13 +93,16 @@ class Controller:
     def zero_torque_state(self):
         print("Enter zero torque state.")
         print("Waiting for the start signal...")
-        while self.remote_controller.button[KeyMap.start] != 1:
-            create_zero_cmd(self.low_cmd)
-            self.send_cmd(self.low_cmd)
-            time.sleep(self.config.control_dt)
+        #sleep 2s
+        time.sleep(2.0)
+        #while self.remote_controller.button[KeyMap.start] != 1:
+        create_zero_cmd(self.low_cmd)
+        self.send_cmd(self.low_cmd)
+        time.sleep(self.config.control_dt)
 
     def move_to_default_pos(self):
         print("Moving to default pos.")
+        #time.sleep(2.0)
         # move time 2s
         total_time = 2
         num_step = int(total_time / self.config.control_dt)
@@ -132,23 +135,25 @@ class Controller:
     def default_pos_state(self):
         print("Enter default pos state.")
         print("Waiting for the Button A signal...")
-        while self.remote_controller.button[KeyMap.A] != 1:
-            for i in range(len(self.config.leg_joint2motor_idx)):
-                motor_idx = self.config.leg_joint2motor_idx[i]
-                self.low_cmd.motor_cmd[motor_idx].q = self.config.default_angles[i]
-                self.low_cmd.motor_cmd[motor_idx].qd = 0
-                self.low_cmd.motor_cmd[motor_idx].kp = self.config.kps[i]
-                self.low_cmd.motor_cmd[motor_idx].kd = self.config.kds[i]
-                self.low_cmd.motor_cmd[motor_idx].tau = 0
-            for i in range(len(self.config.arm_waist_joint2motor_idx)):
-                motor_idx = self.config.arm_waist_joint2motor_idx[i]
-                self.low_cmd.motor_cmd[motor_idx].q = self.config.arm_waist_target[i]
-                self.low_cmd.motor_cmd[motor_idx].qd = 0
-                self.low_cmd.motor_cmd[motor_idx].kp = self.config.arm_waist_kps[i]
-                self.low_cmd.motor_cmd[motor_idx].kd = self.config.arm_waist_kds[i]
-                self.low_cmd.motor_cmd[motor_idx].tau = 0
-            self.send_cmd(self.low_cmd)
-            time.sleep(self.config.control_dt)
+        time.sleep(20.0)
+        print("Start for the Button A signal...")
+        #while self.remote_controller.button[KeyMap.A] != 1:
+        for i in range(len(self.config.leg_joint2motor_idx)):
+            motor_idx = self.config.leg_joint2motor_idx[i]
+            self.low_cmd.motor_cmd[motor_idx].q = self.config.default_angles[i]
+            self.low_cmd.motor_cmd[motor_idx].qd = 0
+            self.low_cmd.motor_cmd[motor_idx].kp = self.config.kps[i]
+            self.low_cmd.motor_cmd[motor_idx].kd = self.config.kds[i]
+            self.low_cmd.motor_cmd[motor_idx].tau = 0
+        for i in range(len(self.config.arm_waist_joint2motor_idx)):
+            motor_idx = self.config.arm_waist_joint2motor_idx[i]
+            self.low_cmd.motor_cmd[motor_idx].q = self.config.arm_waist_target[i]
+            self.low_cmd.motor_cmd[motor_idx].qd = 0
+            self.low_cmd.motor_cmd[motor_idx].kp = self.config.arm_waist_kps[i]
+            self.low_cmd.motor_cmd[motor_idx].kd = self.config.arm_waist_kds[i]
+            self.low_cmd.motor_cmd[motor_idx].tau = 0
+        self.send_cmd(self.low_cmd)
+        time.sleep(self.config.control_dt)
 
     def run(self):
         self.counter += 1
@@ -238,7 +243,7 @@ if __name__ == "__main__":
     config = Config(config_path)
 
     # Initialize DDS communication
-    ChannelFactoryInitialize(0, args.net)
+    ChannelFactoryInitialize(1, "lo")
 
     controller = Controller(config)
 
@@ -250,7 +255,7 @@ if __name__ == "__main__":
 
     # Enter the default position state, press the A key to continue executing
     controller.default_pos_state()
-
+    #time.sleep(10)
     while True:
         try:
             controller.run()

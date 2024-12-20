@@ -74,6 +74,7 @@ if __name__ == "__main__":
     m.opt.timestep = simulation_dt
 
     # load policy
+    print(f"Loading policy from {policy_path}")
     policy = torch.jit.load(policy_path)
 
     with mujoco.viewer.launch_passive(m, d) as viewer:
